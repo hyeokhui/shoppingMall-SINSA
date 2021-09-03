@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+					"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="myInfo"><!-- 클래스명 -->
+
+
+
+
+
+
+	<select id="myInfo"
+		resultType="kr.co.sinsa.biz.customer.CustomerVO">
+		SELECT
+		CUS_NUM ,
+		CUS_ID ,
+		CUS_PWD ,
+		CUS_NAME ,
+		CUS_GENDER ,
+		CUS_EMAIL ,
+		CUS_ADDR ,
+		CUS_TEL,
+		CUS_BIRTH ,
+		CUS_DELIV_ADDR ,
+		CUS_POINT ,
+		CUS_REGDATE
+		FROM CUSTOMER WHERE
+		CUS_ID = #{CUS_ID}
+	</select>
+
+
+
+
+	<select id="orders" parameterType="Map"
+		resultType="kr.co.sinsa.biz.customer.MyOrderListVO">
+		select
+		ORDERS.ORDER_NUM,
+		ORDERS.ORDER_PRDNAME,
+		ORDERS.ORDER_PRDSIZE,
+		ORDERS.ORDER_PRICE,
+		ORDERS.ORDER_STATE,
+		ORDERS.ORDER_REGDATE,
+		ORDERS.ORDER_PRDCODE,
+		ORDERS.ORDER_AMOUNT,
+		ORDERS.ORDER_DELIVCOMP,
+		ORDERS.ORDER_DELIVNUM,
+		ORDER_USEPOINT,
+		PRODUCT.PRD_BRAND,
+		PRODUCT.PRD_IMAGE
+		from ORDERS
+		join PRODUCT on
+		ORDERS.ORDER_PRDCODE=PRODUCT.PRD_CODE
+		where ORDERS.ORDER_CUSID= #{ID}
+		order by ORDERS.ORDER_REGDATE desc,
+		ORDERS.ORDER_NUM desc
+		limit
+		#{page},10;
+	</select>
+
+	<select id="orderDate" parameterType="Map"
+		resultType="kr.co.sinsa.biz.customer.MyOrderListVO">
+			<![CDATA[
+		select 
+		ORDERS.ORDER_NUM, 
+		ORDERS.ORDER_PRDNAME,
+		ORDERS.ORDER_PRDSIZE,
+		ORDERS.ORDER_PRICE,
+		ORDERS.ORDER_STATE, 
+		ORDERS.ORDER_REGDATE,
+		ORDERS.ORDER_PRDCODE,
+		ORDERS.ORDER_AMOUNT,
+		ORDERS.ORDER_DELIVCOMP,
+		ORDERS.ORDER_DELIVNUM,
+		ORDER_USEPOINT,
+		PRODUCT.PRD_BRAND,
+		PRODUCT.PRD_IMAGE
+		from ORDERS 
+		join PRODUCT on 
+		ORDERS.ORDER_PRDCODE=PRODUCT.PRD_CODE
+		where  ORDERS.ORDER_CUSID= #{ID} and 
+		ORDERS.ORDER_REGDATE >= #{date1} and 
+		ORDERS.ORDER_REGDATE < DATE_add(#{date2},INTERVAL 1 Day)
+		order by ORDERS.ORDER_REGDATE desc,
+		ORDERS.ORDER_NUM desc 
+		limit #{page},10;
+		]]>
+	</select>
+
+	<select id="countState" parameterType="Map" resultType="int">
+		select
+		count(*)
+		from ORDERS
+		where ORDER_CUSID = #{ID} and ORDER_STATE =
+		#{STATE};
+	</select>
+
+	<select id="countStateDate" parameterType="Map" resultType="int">
+			<![CDATA[
+		select
+		count(*)
+		from ORDERS 
+		where ORDER_CUSID = #{ID} and ORDER_REGDATE >= #{date1} and ORDER_REGDATE < DATE_add(#{date2},INTERVAL 1 Day) and ORDER_STATE = #{STATE};
+			]]>
+	</select>
+
+	<select id="countOders" parameterType="Map" resultType="int">
+		select
+		count(*)
+		from ORDERS
+		where ORDER_CUSID = #{ID};
+	</select>
+
+	<select id="countOdersDate" parameterType="Map" resultType="int">
+			<![CDATA[
+		select
+		count(*)
+		from ORDERS 
+		where ORDER_CUSID = #{ID} and ORDER_REGDATE >= #{date1} and ORDER_REGDATE < DATE_add(#{date2},INTERVAL 1 Day);
+			]]>
+	</select>
+
+
+	<select id="orderStatus"
+		resultType="kr.co.sinsa.biz.orders.OrdersAndProductVO">
+		select
+		ORDERS.ORDER_NUM,
+		ORDERS.ORDER_CUSID ,
+		ORDERS.ORDER_PRDCODE ,
+		ORDERS.ORDER_PRDNAME ,
+		ORDERS.ORDER_PRDSIZE ,
+		ORDERS.ORDER_AMOUNT ,
+		ORDERS.ORDER_RECEIVER ,
+		ORDERS.ORDER_TEL ,
+		ORDERS.ORDER_ADDR ,
+		ORDERS.ORDER_PRICE ,
+		ORDERS.ORDER_STATE ,
+		ORDERS.ORDER_MEMO ,
+		ORDERS.ORDER_REGDATE ,
+		ORDERS.ORDER_DELIVCOMP ,
+		ORDERS.ORDER_DELIVNUM ,
+		ORDERS.ORDER_USEPOINT ,
+		PRODUCT.PRD_NUM ,
+		PRODUCT.PRD_CODE ,
+		PRODUCT.PRD_NAME ,
+		PRODUCT.PRD_CATEGORY ,
+		PRODUCT.PRD_IMAGE ,
+		PRODUCT.PRD_PRICE ,
+		PRODUCT.PRD_BRAND ,
+		PRODUCT.PRD_DISRATE
+		from ORDERS join PRODUCT on
+		ORDERS.ORDER_PRDCODE=PRODUCT.PRD_CODE
+		where ORDER_NUM = #{value}
+
+
+
+
+	</select>
+
+
+
+
+
+
+	<select id="jjimList" parameterType="Map"
+		resultType="kr.co.sinsa.biz.product.ProductVO">
+		select product.* from product join JJIM on JJIM.JJIM_PRDNUM
+		= product.PRD_NUM
+		where JJIM.JJIM_CUSID = #{ID}
+
+		limit #{page},6;
+	</select>
+
+	<select id="countJjimList" parameterType="Map" resultType="int">
+		select count(*) from product join JJIM on JJIM.JJIM_PRDNUM
+		=
+		product.PRD_NUM
+		where JJIM.JJIM_CUSID = #{ID};
+	</select>
+
+
+
+
+
+
+
+
+	<select id="reviewCheck" parameterType="Map" resultType="int">
+		select
+		count(*) from review
+		where
+		REV_PRDCODE = #{PRD_CODE} and
+		REV_ORDERNUM =
+		#{ORDER_NUM}
+		and
+		REV_ORDERPRDSIZE = #{ORDER_PRDSIZE};
+	</select>
+
+	<select id="productSerch"
+		resultType="kr.co.sinsa.biz.product.ProductVO">
+		select
+		PRD_IMAGE,
+		PRD_CODE ,
+		PRD_NAME ,
+		PRD_BRAND
+		from product
+		where PRD_CODE = #{value};
+	</select>
+
+	<insert id="reviewInsert"
+		parameterType="kr.co.sinsa.biz.customer.ReviewVO">
+		insert into review(REV_ORDERNUM, REV_ORDERPRDSIZE ,
+		REV_CUSID, REV_PRDCODE ,
+		REV_TITLE , REV_CONTENT , REV_IMAGE , REV_STAR
+		)
+		values(#{REV_ORDERNUM}, #{REV_ORDERPRDSIZE} , #{REV_CUSID},
+		#{REV_PRDCODE} , #{REV_TITLE} , #{REV_CONTENT} , #{REV_IMAGE} ,
+		#{REV_STAR});
+
+	</insert>
+
+	<select id="countReviewsDate" parameterType="Map"
+		resultType="int">
+<![CDATA[
+select count(*) from review 
+where REV_CUSID = #{ID} and REV_REGDATE  >= #{date1} and REV_REGDATE  < DATE_add(#{date2},INTERVAL 1 Day);
+]]>
+
+	</select>
+
+	<select id="countReviews" parameterType="Map" resultType="int">
+		select
+		count(*) from review
+		where REV_CUSID = #{ID};
+	</select>
+
+	<select id="myReviewsDate" parameterType="Map" resultType="kr.co.sinsa.biz.customer.ReviewVO">
+<![CDATA[
+select 
+REV_NUM ,
+REV_ORDERNUM ,
+REV_ORDERPRDSIZE ,
+REV_CUSID ,
+REV_PRDCODE ,
+REV_TITLE ,
+REV_CONTENT ,
+REV_STAR ,
+REV_IMAGE ,
+REV_REGDATE 
+from review 
+where REV_CUSID = #{ID} and REV_REGDATE  >= #{date1} and REV_REGDATE  < DATE_add(#{date2},INTERVAL 1 Day)
+order by REV_NUM  desc
+		limit #{page},10;
+
+]]>
+
+	</select>
+	<select id="myReviews" parameterType="Map" resultType="kr.co.sinsa.biz.customer.ReviewVO">
+		select
+		REV_NUM ,
+		REV_ORDERNUM ,
+		REV_ORDERPRDSIZE ,
+		REV_CUSID ,
+		REV_PRDCODE ,
+		REV_TITLE ,
+		REV_CONTENT ,
+		REV_STAR ,
+		REV_IMAGE ,
+		REV_REGDATE
+		from review
+		where REV_CUSID = #{ID}
+		order by REV_NUM desc
+		limit #{page},10;
+	</select>
+
+<select id="productMatchReview" resultType="kr.co.sinsa.biz.orders.OrdersAndProductVO">
+	select
+	ORDERS.ORDER_PRDCODE ,
+	ORDERS.ORDER_PRDNAME ,
+	ORDERS.ORDER_PRDSIZE ,
+	PRODUCT.PRD_BRAND ,
+	PRODUCT.PRD_IMAGE
+	from ORDERS join Product on ORDERS.ORDER_PRDCODE = PRODUCT.PRD_CODE
+	where ORDER_NUM = #{value};
+</select>
+
+
+
+
+
+	<select id="QnAList" parameterType="Map"
+		resultType="kr.co.sinsa.biz.customer.QnAVO">
+		select
+		QNA_NUM,
+		PRD_NUM ,
+		QNA_LOCK ,
+		QNA_CUSID ,
+		QNA_TITLE ,
+		QNA_CONTENT ,
+		QNA_ANSWER ,
+		QNA_REGDATE
+		from QNA where QNA_CUSID = #{ID}
+		order by QNA_REGDATE desc
+		limit #{page},10;
+	</select>
+
+	<select id="QnAListDate" parameterType="Map"
+		resultType="kr.co.sinsa.biz.customer.QnAVO">
+			<![CDATA[
+		select 
+		QNA_NUM,
+		PRD_NUM ,
+		QNA_LOCK ,
+		QNA_CUSID ,
+		QNA_TITLE ,
+		QNA_CONTENT ,
+		QNA_ANSWER ,
+		QNA_REGDATE 
+		 from QNA where QNA_CUSID = #{ID} 
+		and QNA_REGDATE  >= #{date1} and QNA_REGDATE < DATE_add(#{date2},INTERVAL 1 Day)
+		order by QNA_REGDATE  desc
+		limit #{page},10;
+		]]>
+	</select>
+
+	<select id="productMatch"
+		resultType="kr.co.sinsa.biz.product.ProductVO">
+		select
+		PRD_CODE ,
+		PRD_NAME ,
+		PRD_BRAND ,
+		PRD_IMAGE
+		from product
+		where PRD_NUM = #{value};
+	</select>
+
+	<select id="countQnAList" parameterType="Map" resultType="int">
+		select
+		count(*) from QNA where QNA_CUSID = #{ID};
+	</select>
+
+	<select id="countQnAListDate" parameterType="Map"
+		resultType="int">
+			<![CDATA[
+		select count(*) from QNA where QNA_CUSID = #{ID}
+		and QNA_REGDATE >= #{date1} and QNA_REGDATE < DATE_add(#{date2},INTERVAL 1 Day) ;
+			]]>
+	</select>
+
+
+
+
+
+
+
+	<select id="recentView" parameterType="int"
+		resultType="kr.co.sinsa.biz.product.ProductVO">
+		select * from product
+		where PRD_NUM = #{value} ;
+	</select>
+
+	<select id="allProductNum" parameterType="int"
+		resultType="kr.co.sinsa.biz.product.ProductVO">
+		select PRD_NUM from product;
+	</select>
+
+
+	<select id="passCheck" parameterType="Map" resultType="int">
+		select
+		count(*)
+		from
+		customer where CUS_ID = #{ID} and CUS_PWD = #{PASSWORD};
+	</select>
+
+	<update id="passChange" parameterType="Map">
+		update customer
+		set
+		CUS_PWD
+		= #{PASSWORD}
+		where CUS_ID = #{ID};
+	</update>
+
+	<update id="privateInfoChange"
+		parameterType="kr.co.sinsa.biz.customer.CustomerVO">
+		update customer
+		set
+		CUS_NAME = #{CUS_NAME },
+		CUS_GENDER
+		=#{CUS_GENDER },
+		CUS_EMAIL =#{CUS_EMAIL },
+		CUS_ADDR = #{CUS_ADDR },
+		CUS_TEL = #{CUS_TEL },
+		CUS_BIRTH = #{CUS_BIRTH }
+		where CUS_ID =
+		#{CUS_ID};
+	</update>
+
+
+
+	<update id="refund" parameterType="Map">
+		update orders
+		set
+		ORDER_STATE =
+		'환불신청'
+		where
+		ORDER_NUM = #{orderum} and
+		ORDER_PRDCODE = #{prdcode} and
+		ORDER_PRDSIZE = #{prdsize};
+
+	</update>
+
+	<update id="cancel" parameterType="Map">
+		update orders
+		set
+		ORDER_STATE =
+		'취소'
+		where
+		ORDER_NUM = #{orderum} and
+		ORDER_PRDCODE = #{prdcode} and
+		ORDER_PRDSIZE = #{prdsize};
+
+	</update>
+
+	<select id="selJjimById"
+		parameterType="kr.co.sinsa.biz.customer.JjimVO"
+		resultType="kr.co.sinsa.biz.customer.JjimVO">
+		select * from jjim where JJIM_CUSID = #{JJIM_CUSID} AND
+		JJIM_PRDNUM = #{JJIM_PRDNUM};
+	</select>
+
+	<insert id="addJjim"
+		parameterType="kr.co.sinsa.biz.customer.JjimVO">
+		insert into jjim (JJIM_CUSID, JJIM_PRDNUM)
+		values(#{JJIM_CUSID},#{JJIM_PRDNUM});
+	</insert>
+
+	<delete id="removeJjim"
+		parameterType="kr.co.sinsa.biz.customer.JjimVO">
+		DELETE FROM jjim WHERE JJIM_CUSID = #{JJIM_CUSID} AND
+		JJIM_PRDNUM = #{JJIM_PRDNUM};
+	</delete>
+
+	<select id="selCartById"
+		parameterType="kr.co.sinsa.biz.customer.CartVO"
+		resultType="kr.co.sinsa.biz.customer.CartVO">
+		select * from CART where CART_CUSID = #{CART_CUSID} AND
+		CART_PRDNUM = #{CART_PRDNUM} AND CART_PRDSIZE = #{CART_PRDSIZE};
+	</select>
+
+	<insert id="addCart"
+		parameterType="kr.co.sinsa.biz.customer.CartVO">
+		insert into CART (CART_CUSID, CART_PRDNUM, CART_PRDSIZE,
+		CART_PRDCOUNT) values(#{CART_CUSID},#{CART_PRDNUM},#{CART_PRDSIZE},
+		1);
+	</insert>
+
+	<delete id="chckDeleteCart">
+		delete from CART where CART_CUSID=#{CART_CUSID}
+	</delete>
+
+</mapper>
